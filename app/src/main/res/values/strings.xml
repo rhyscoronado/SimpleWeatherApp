@@ -1,0 +1,46 @@
+<resources>
+    <string name="app_name">Weather App</string>
+
+
+    <!--Dialog Strings-->
+
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+
+
+    <!--Weather Related Strings-->
+
+
+    <string name="action_weather_map">Weather Map</string>
+    <string name="weather_sunny" translatable="false">&#xf00d;</string>
+    <string name="weather_clear_night" translatable="false">&#xf02e;</string>
+    <string name="weather_foggy" translatable="false">&#xf014;</string>
+    <string name="weather_cloudy" translatable="false">&#xf013;</string>
+    <string name="weather_rainy" translatable="false">&#xf019;</string>
+    <string name="weather_snowy" translatable="false">&#xf01b;</string>
+    <string name="weather_thunder" translatable="false">&#xf01e;</string>
+    <string name="weather_drizzle" translatable="false">&#xf01c;</string>
+
+
+
+    <!--Data/Location/Settings-->
+
+    <string name="location_settings">Location Settings</string>
+    <string name="location_settings_message">Location is not enabled. Do you wish to go to the settings menu?</string>
+    <string name="location_settings_button">Settings</string>
+    <string name="downloading_data">Downloading your data ...</string>
+    <string name="getting_location">Getting your location ...</string>
+    <string name="last_update">Last update:\n%s</string>
+
+
+    <!--Network Error Response-->
+
+    <string name="generic_error">An error occured.</string>
+    <string name="timeout_error">No connection available.</string>
+    <string name="auth_error">Authentication Failure.</string>
+    <string name="server_error">Server error.</string>
+    <string name="network_error">Network Error</string>
+    <string name="parse_error">Parse Error</string>
+
+
+</resources>

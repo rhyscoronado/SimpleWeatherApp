@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorPrimaryDark">
+
+    <LinearLayout
+        android:id="@+id/llWeatherContainer"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/tvCityCountry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:text="London, GB"/>
+
+
+        <ImageView
+            android:id="@+id/ivWeatherImage"
+            android:layout_marginTop="10dp"
+            android:layout_width="200dp"
+            android:layout_height="200dp" />
+
+        <TextView
+            android:id="@+id/tvTemperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:text="Temperature"/>
+
+
+        <TextView
+            android:id="@+id/tvWeatherDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:text="Sunny"/>
+
+
+        <TextView
+            android:id="@+id/tvHumidity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:text="Humidity: "/>
+
+        <!--<TextView-->
+            <!--android:id="@+id/tvSunrise"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textColor="@color/white"-->
+            <!--android:text="Sunrise: "/>-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/tvSunset"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textColor="@color/white"-->
+            <!--android:text="Sunset"/>-->
+
+    </LinearLayout>
+
+</LinearLayout>
