@@ -26,19 +26,26 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.google.gson.JsonObject;
 import com.rhyscoronado.weatherapp.R;
 import com.rhyscoronado.weatherapp.api.WeatherApi;
 import com.rhyscoronado.weatherapp.business.BaseApplication;
 import com.rhyscoronado.weatherapp.constants.Constants;
 import com.rhyscoronado.weatherapp.fragment.WeatherInfoFragment;
 import com.rhyscoronado.weatherapp.interfaces.ResponseHandler;
+import com.rhyscoronado.weatherapp.model.WeatherMain;
 import com.rhyscoronado.weatherapp.responsemodel.WeatherResponse;
 
 import com.rhyscoronado.weatherapp.model.Weather;
 import com.rhyscoronado.weatherapp.util.DateTimeUtil;
 import com.rhyscoronado.weatherapp.util.NetworkUtil;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Calendar;
+
+import parser.WeatherParser;
 
 
 /**
@@ -74,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         _weatherInfoFragment = (WeatherInfoFragment) getFragmentManager().findFragmentByTag("weather");
         _requestQueue = BaseApplication.getInstance().getRequestQueue();
         _sharedPreferences = BaseApplication.getInstance().getSharedPreference();
-        _tvLastUpdated = findViewById(R.id.tvLastUpdated);
+//        _tvLastUpdated = findViewById(R.id.tvLastUpdated);
 
 
 
@@ -127,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
      * Loads the weather data to the UI
      */
 
-    private void loadWeatherToFragment(Weather weather) {
+    private void loadWeatherToFragment(WeatherMain weather) {
 
         _weatherInfoFragment.setWeatherData(weather);
 
@@ -140,15 +147,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         if(sp.getBoolean(Constants.CACHED,false)) {
 
-            Weather weather = new Weather();
+            WeatherMain weather = new WeatherMain();
 
-            weather.setCity((sp.getString((Constants.CITY), "")));
-            weather.setCountry((sp.getString((Constants.COUNTRY), "")));
-            weather.setTemperature((sp.getFloat((Constants.TEMPERATURE), 0)));
-            weather.setHumidity((sp.getFloat((Constants.HUMIDITIY), 0)));
-            weather.setWeatherIcon((sp.getString((Constants.WEATHER_ICON), "")));
-            weather.setWeatherDescription((sp.getString((Constants.WEATHER_DESCRIPTION), "")));
-            weather.setWeather((sp.getString((Constants.WEATHER_INFO), "")));
 
             loadWeatherToFragment(weather);
 
@@ -259,8 +259,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private void getWeatherForCity(String latitude, String longitude) {
 
-        Request request = WeatherApi.getWeather(RC_GET_CITY_WEATHER, latitude, longitude, this);
-        _requestQueue.add(request);
+        WeatherApi.FetchWeatherData task = new WeatherApi.FetchWeatherData(latitude, longitude, this);
+        task.execute();
+
     }
 
     @Override
@@ -279,39 +280,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     }
 
 
-    /**
-     * Handles webservice response
-     */
-
-
-    @Override
-    public void onSuccess(int requestCode, Object object) {
-
-        switch (requestCode) {
-            case RC_GET_CITY_WEATHER:
-
-                Weather weather = new Weather(getApplicationContext(), (WeatherResponse) object);
-                loadWeatherToFragment(weather);
-
-                saveLastUpdateTime(_sharedPreferences);
-                updateLastUpdateTime();
-
-                break;
-        }
-
-    }
-
-
-
-    @Override
-    public void onFailed(int requestCode, String message) {
-
-        _progressDialog.hide();
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-
-    }
-
-
 
     public static long saveLastUpdateTime(SharedPreferences sp) {
         Calendar now = Calendar.getInstance();
@@ -326,12 +294,51 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     }
 
     private void updateLastUpdateTime(long timeInMillis) {
-        if (timeInMillis < 0) {
-            // No time
-            _tvLastUpdated.setText("");
-        } else {
-            _tvLastUpdated.setText(getString(R.string.last_update, DateTimeUtil.formatTimeWithDayIfNotToday(this, timeInMillis)));
+//        if (timeInMillis < 0) {
+//            // No time
+//            _tvLastUpdated.setText("");
+//        } else {
+//            _tvLastUpdated.setText(getString(R.string.last_update, DateTimeUtil.formatTimeWithDayIfNotToday(this, timeInMillis)));
+//        }
+    }
+
+    @Override
+    public void onResponse(boolean isSuccess, int requestCode, String object) {
+        switch (requestCode) {
+            case RC_GET_CITY_WEATHER:
+
+                if(isSuccess) {
+
+                    parseObject(object);
+
+//                    saveLastUpdateTime(_sharedPreferences);
+//                    updateLastUpdateTime();
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "Something went wrong, please try again!", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+
+                break;
         }
     }
 
+    private void parseObject(String object) {
+
+        WeatherMain weatherMain = new WeatherMain();
+
+        try {
+            JSONObject weather = new JSONObject(object);
+            weatherMain = WeatherParser.parseWeatherForecast(weather);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        loadWeatherToFragment(weatherMain);
+
+    }
 }

@@ -5,26 +5,26 @@
     android:orientation="vertical">
 
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:orientation="vertical">-->
 
-        <TextView
-            android:id="@+id/tvLastUpdated"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Last Update: "
-            android:textAlignment="center"
-            android:textSize="14sp" />
+        <!--<TextView-->
+            <!--android:id="@+id/tvLastUpdated"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Last Update: "-->
+            <!--android:textSize="14sp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:gravity="center"/>-->
 
-    </LinearLayout>
+    <!--</LinearLayout>-->
 
     <fragment
         class="com.rhyscoronado.weatherapp.fragment.WeatherInfoFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="20dp"
         android:tag="weather" />
 
 

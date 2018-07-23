@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +14,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.rhyscoronado.weatherapp.R;
+import com.rhyscoronado.weatherapp.adapter.WeatherListAdapter;
 import com.rhyscoronado.weatherapp.constants.Constants;
 import com.rhyscoronado.weatherapp.model.Weather;
+import com.rhyscoronado.weatherapp.model.WeatherMain;
 import com.rhyscoronado.weatherapp.util.UnitConvertor;
 import com.rhyscoronado.weatherapp.util.WeatherUtil;
 
@@ -23,21 +27,22 @@ import com.rhyscoronado.weatherapp.util.WeatherUtil;
 
 public class WeatherInfoFragment extends Fragment {
 
-    private View _rootView;
-    private Weather _weather;
+    private View rootView;
+    private WeatherMain weather;
 
-    private ImageView _ivWeatherImage;
-    private TextView _tvCityCountry;
-    private TextView _tvTemperature;
-    private TextView _tvWeatherDescription;
-    private TextView _tvHumidity;
-    private TextView _tvSunrise;
-    private TextView _tvSunset;
+    private RecyclerView recyclerView;
+//    private ImageView ivWeatherImage;
+//    private TextView tvCityCountry;
+//    private TextView tvTemperature;
+//    private TextView tvWeatherDescription;
+//    private TextView tvHumidity;
+//    private TextView tvSunrise;
+//    private TextView tvSunset;
 
 
-    public void setWeatherData(Weather weather) {
+    public void setWeatherData(WeatherMain weather) {
 
-        _weather = weather;
+        this.weather = weather;
         showWeatherData();
     }
 
@@ -51,44 +56,52 @@ public class WeatherInfoFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        if (_rootView == null) {
-            _rootView = inflater.inflate(R.layout.fragment_weather_info, container, false);
+        if (rootView == null) {
+            rootView = inflater.inflate(R.layout.fragment_weather_list, container, false);
+
         }
 
-        return _rootView;
+        return rootView;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        initViews(_rootView);
+        initViews(rootView);
 
     }
 
     private void initViews(View rootView) {
 
-        _ivWeatherImage = rootView.findViewById(R.id.ivWeatherImage);
-        _tvCityCountry = rootView.findViewById(R.id.tvCityCountry);
-        _tvHumidity = rootView.findViewById(R.id.tvHumidity);
-        _tvTemperature = rootView.findViewById(R.id.tvTemperature);
-        _tvWeatherDescription = rootView.findViewById(R.id.tvWeatherDescription);
+        recyclerView = rootView.findViewById(R.id.rvWeatherList);
+
+//        ivWeatherImage = rootView.findViewById(R.id.ivWeatherImage);
+//        tvCityCountry = rootView.findViewById(R.id.tvCityCountry);
+//        tvHumidity = rootView.findViewById(R.id.tvHumidity);
+//        tvTemperature = rootView.findViewById(R.id.tvTemperature);
+//        tvWeatherDescription = rootView.findViewById(R.id.tvWeatherDescription);
 
     }
 
 
     private void showWeatherData() {
 
-        _ivWeatherImage.setImageBitmap(WeatherUtil.getWeatherIcon(_weather.getWeatherIcon(), getActivity()));
-        _tvCityCountry.setText(String.format("%s, %s", _weather.getCity(), _weather.getCountry()));
-        _tvTemperature.setText(String.format("%s °C", String.valueOf(Math.round(UnitConvertor.convertTemperature(_weather.getTemperature())))));
-        _tvHumidity.setText(String.format("Humidity: %d%s", Math.round(_weather.getHumidity()), "%"));
+        WeatherListAdapter weatherListAdapter = new WeatherListAdapter(getActivity(), weather);
+        final LinearLayoutManager weatherLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(weatherLayoutManager);
+        recyclerView.setAdapter(weatherListAdapter);
 
-        String description = _weather.getWeatherDescription();
-        description = description = description.substring(0,1).toUpperCase() + description.substring(1);
-        _tvWeatherDescription.setText(description);
+//        ivWeatherImage.setImageBitmap(WeatherUtil.getWeatherIcon(weather.getList().getWeather().get(0).getIcon(), getActivity()));
+//        tvCityCountry.setText(String.format("%s, %s", weather.getCity().getName(), weather.getCity().getCountry()));
+//        tvTemperature.setText(String.format("%s °C", String.valueOf(Math.round(UnitConvertor.convertTemperature(weather.getList().getMain().getTemp().floatValue())))));
+//        tvHumidity.setText(String.format("Humidity: %d%s", Math.round(weather.getList().getMain().getHumidity()), "%"));
+//
+//        String description = weather.getList().getWeather().get(0).getDescription();
+//        description = description = description.substring(0,1).toUpperCase() + description.substring(1);
+//        tvWeatherDescription.setText(description);
 
-        saveLastWeatherInfo(_weather);
+//        saveLastWeatherInfo(weather);
 
 
 
@@ -98,18 +111,18 @@ public class WeatherInfoFragment extends Fragment {
      * Save last downloaded weather data for offline mode
      */
 
-    private void saveLastWeatherInfo(Weather weather){
+    private void saveLastWeatherInfo(WeatherMain weather){
 
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
-        editor.putBoolean(Constants.CACHED, true);
-        editor.putString(Constants.CITY, weather.getCity());
-        editor.putString(Constants.COUNTRY, weather.getCountry());
-        editor.putFloat(Constants.TEMPERATURE, weather.getTemperature());
-        editor.putString(Constants.WEATHER_INFO, weather.getWeather());
-        editor.putString(Constants.WEATHER_DESCRIPTION, weather.getWeatherDescription());
-        editor.putString(Constants.WEATHER_ICON, weather.getWeatherIcon());
-        editor.putFloat(Constants.HUMIDITIY, (float) weather.getHumidity());
-        editor.apply();
+//        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+//        editor.putBoolean(Constants.CACHED, true);
+//        editor.putString(Constants.CITY, weather.getCity().getName());
+//        editor.putString(Constants.COUNTRY, weather.getCity().getCountry());
+//        editor.putFloat(Constants.TEMPERATURE, weather.getList().getMain().getTemp().floatValue());
+//        editor.putString(Constants.WEATHER_INFO, weather.getList().getWeather().get(0).getMain());
+//        editor.putString(Constants.WEATHER_DESCRIPTION, weather.getList().getWeather().get(0).getDescription());
+//        editor.putString(Constants.WEATHER_ICON, weather.getList().getWeather().get(0).getIcon());
+//        editor.putFloat(Constants.HUMIDITIY, (float) weather.getList().getMain().getHumidity());
+//        editor.apply();
     }
 
 

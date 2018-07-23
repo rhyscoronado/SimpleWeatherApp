@@ -6,7 +6,7 @@ package com.rhyscoronado.weatherapp.constants;
 
 public class Constants {
 
-    public static final String DOMAIN = "http://api.openweathermap.org/data/2.5";
+    public static final String DOMAIN = "http://api.openweathermap.org/data/2.5/forecast/";
     public static final String WEATHER = "weather";
     public static final String APPID = "appid";
     public static final String LAT = "lat";

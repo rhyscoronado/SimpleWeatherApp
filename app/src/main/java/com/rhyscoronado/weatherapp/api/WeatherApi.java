@@ -1,5 +1,8 @@
 package com.rhyscoronado.weatherapp.api;
 
+import android.os.AsyncTask;
+import android.util.Log;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
 import com.android.volley.NoConnectionError;
@@ -19,6 +22,12 @@ import com.rhyscoronado.weatherapp.util.GsonUtility;
 
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,50 +37,76 @@ import java.util.Map;
 
 public class WeatherApi {
 
-    public static Request getWeather(final int requestCode, String lat, String lon, final ResponseHandler responseHandler) {
+    public static class FetchWeatherData extends AsyncTask<Void, Void, String> {
 
-        String url = String.format("%s/%s?%s=%s&%s=%s&%s=%s",
-                Constants.DOMAIN, Constants.WEATHER, Constants.LAT, lat, Constants.LON, lon, Constants.APPID, Constants.APPKEY);
+        String lat, lon;
+        ResponseHandler responseHandler;
 
-        Request getCityWeather = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
+        public FetchWeatherData(String latitude, String longitude, ResponseHandler handler) {
+            lat = latitude;
+            lon = longitude;
+            responseHandler = handler;
+        }
 
-                Gson gson = GsonUtility.createGsonBuilder(WeatherResponse.class, new WeatherResponse.WeatherResponseInstance()).create();
-                WeatherResponse apiResponse = null;
-                apiResponse = gson.fromJson(response.toString(), WeatherResponse.class);
-                responseHandler.onSuccess(requestCode, apiResponse);
+        @Override
+        protected String doInBackground(Void... params) {
 
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
 
-            }
-        }, new Response.ErrorListener() {
+            String forecastJsonStr = null;
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                String message = "An error occured.";
-                if (error instanceof TimeoutError || error instanceof NoConnectionError) {
-                    message = "No connection available.";
-                } else if (error instanceof AuthFailureError) {
-                    message = "Authentication Failure.";
-                } else if (error instanceof ServerError) {
-                    message = "Server error.";
-                } else if (error instanceof NetworkError) {
-                    message = "Network Error.";
-                } else if (error instanceof ParseError) {
-                    message = "Parse error.";
+            try {
+                URL url = new URL(String.format("%s?%s=%s&%s=%s&%s=%s",
+                        Constants.DOMAIN, Constants.LAT, lat, Constants.LON, lon, Constants.APPID, Constants.APPKEY));
+
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                // Read the input stream into a String
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    return null;
                 }
-                responseHandler.onFailed(requestCode, message);
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line + "\n");
+                }
+
+                if (buffer.length() == 0) {
+                    return null;
+                }
+                forecastJsonStr = buffer.toString();
+                return forecastJsonStr;
+            } catch (IOException e) {
+                Log.e("PlaceholderFragment", "Error ", e);
+
+                responseHandler.onResponse(false, 1001, "Something went wrong.");
+                return null;
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e("PlaceholderFragment", "Error closing stream", e);
+                    }
+                }
+
             }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
+        }
 
-                return params;
-            }
-        };
-
-        return getCityWeather;
-
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Log.i("json", s);
+            responseHandler.onResponse(true, 1001, s);
+        }
     }
 }
