@@ -14,7 +14,7 @@
         android:gravity="center">
 
         <TextView
-            android:id="@+id/tvCityCountry"
+            android:id="@+id/tvWeatherDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
@@ -22,11 +22,14 @@
             android:text="London, GB"/>
 
 
-        <ImageView
+        <TextView
             android:id="@+id/ivWeatherImage"
             android:layout_marginTop="10dp"
             android:layout_width="200dp"
-            android:layout_height="200dp" />
+            android:layout_height="200dp"
+            android:textSize="150dp"
+            android:textColor="@color/white"
+            android:layout_gravity="center"/>
 
         <TextView
             android:id="@+id/tvTemperature"
@@ -38,35 +41,44 @@
 
 
         <TextView
-            android:id="@+id/tvWeatherDescription"
+            android:id="@+id/tvSunrise"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Sunrise"
             android:textColor="@color/white"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:text="Sunny"/>
+            android:textStyle="bold" />
+
 
 
         <TextView
             android:id="@+id/tvHumidity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Humidity"
             android:textColor="@color/white"
-            android:text="Humidity: "/>
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
-        <!--<TextView-->
-            <!--android:id="@+id/tvSunrise"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:textColor="@color/white"-->
-            <!--android:text="Sunrise: "/>-->
+        <TextView
+            android:id="@+id/tvWind"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Wind"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
-        <!--<TextView-->
-            <!--android:id="@+id/tvSunset"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:textColor="@color/white"-->
-            <!--android:text="Sunset"/>-->
+
+        <TextView
+            android:id="@+id/tvClouds"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clouds"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
 
     </LinearLayout>
 

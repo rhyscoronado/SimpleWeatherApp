@@ -24,9 +24,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.google.gson.JsonObject;
 import com.rhyscoronado.weatherapp.R;
 import com.rhyscoronado.weatherapp.api.WeatherApi;
 import com.rhyscoronado.weatherapp.business.BaseApplication;
@@ -34,10 +32,7 @@ import com.rhyscoronado.weatherapp.constants.Constants;
 import com.rhyscoronado.weatherapp.fragment.WeatherInfoFragment;
 import com.rhyscoronado.weatherapp.interfaces.ResponseHandler;
 import com.rhyscoronado.weatherapp.model.WeatherMain;
-import com.rhyscoronado.weatherapp.responsemodel.WeatherResponse;
 
-import com.rhyscoronado.weatherapp.model.Weather;
-import com.rhyscoronado.weatherapp.util.DateTimeUtil;
 import com.rhyscoronado.weatherapp.util.NetworkUtil;
 
 import org.json.JSONException;
@@ -49,27 +44,28 @@ import parser.WeatherParser;
 
 
 /**
- * Created by rhysc on 3/12/18.
+ *
  */
 
 public class MainActivity extends AppCompatActivity implements LocationListener, ResponseHandler {
 
+    private static final String TAG = "Weather";
     private static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION = 1000;
     private static final int RC_GET_CITY_WEATHER = 1001;
 
     //set naming convention for class variables having underline to prevent confusion for inline variables.
 
-    private WeatherInfoFragment _weatherInfoFragment;
+    private WeatherInfoFragment weatherInfoFragment;
 
-    private RequestQueue _requestQueue;
-    private LocationManager _locationManager;
-    private ProgressDialog _progressDialog;
-    private SharedPreferences _sharedPreferences;
+    private RequestQueue requestQueue;
+    private LocationManager locationManager;
+    private ProgressDialog progressDialog;
+    private SharedPreferences sharedPreferences;
 
 
-    boolean _destroyed = false;
+    boolean destroyed = false;
 
-    private TextView _tvLastUpdated;
+    private TextView tvLastUpdated;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -78,11 +74,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         setContentView(R.layout.activity_main);
 
 
-        _weatherInfoFragment = (WeatherInfoFragment) getFragmentManager().findFragmentByTag("weather");
-        _requestQueue = BaseApplication.getInstance().getRequestQueue();
-        _sharedPreferences = BaseApplication.getInstance().getSharedPreference();
-//        _tvLastUpdated = findViewById(R.id.tvLastUpdated);
+        weatherInfoFragment = WeatherInfoFragment.newInstance();
+        requestQueue = BaseApplication.getInstance().getRequestQueue();
+        sharedPreferences = BaseApplication.getInstance().getSharedPreference();
+//        tvLastUpdated = findViewById(R.id.tvLastUpdated);
 
+        getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.main_container, weatherInfoFragment, TAG)
+                .commit();
 
 
         if(NetworkUtil.isNetworkAvailable(getApplicationContext())) {
@@ -118,11 +118,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _destroyed = true;
+        destroyed = true;
 
-        if (_locationManager != null) {
+        if (locationManager != null) {
             try {
-                _locationManager.removeUpdates(MainActivity.this);
+                locationManager.removeUpdates(MainActivity.this);
             } catch (SecurityException e) {
                 e.printStackTrace();
             }
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private void loadWeatherToFragment(WeatherMain weather) {
 
-        _weatherInfoFragment.setWeatherData(weather);
+        weatherInfoFragment.setWeatherData(weather);
 
 
     }
@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     }
 
     private void getCityByLocation() {
-        _locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
@@ -179,27 +179,27 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                         MY_PERMISSIONS_ACCESS_FINE_LOCATION);
             }
 
-        } else if (_locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ||
-                _locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            _progressDialog = new ProgressDialog(this);
-            _progressDialog.setMessage(getString(R.string.getting_location));
-            _progressDialog.setCancelable(false);
-            _progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
+        } else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ||
+                locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage(getString(R.string.getting_location));
+            progressDialog.setCancelable(false);
+            progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     try {
-                        _locationManager.removeUpdates(MainActivity.this);
+                        locationManager.removeUpdates(MainActivity.this);
                     } catch (SecurityException e) {
                         e.printStackTrace();
                     }
                 }
             });
-            _progressDialog.show();
-            if (_locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-                _locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+            progressDialog.show();
+            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
             }
-            if (_locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                _locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
             }
         } else {
             showLocationSettingsDialog();
@@ -243,9 +243,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     @Override
     public void onLocationChanged(Location location) {
-        _progressDialog.hide();
+        progressDialog.hide();
         try {
-            _locationManager.removeUpdates(this);
+            locationManager.removeUpdates(this);
         } catch (SecurityException e) {
             Log.e("LocationManager", "Error while trying to stop listening for location updates. This is probably a permissions issue", e);
         }
@@ -296,9 +296,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     private void updateLastUpdateTime(long timeInMillis) {
 //        if (timeInMillis < 0) {
 //            // No time
-//            _tvLastUpdated.setText("");
+//            tvLastUpdated.setText("");
 //        } else {
-//            _tvLastUpdated.setText(getString(R.string.last_update, DateTimeUtil.formatTimeWithDayIfNotToday(this, timeInMillis)));
+//            tvLastUpdated.setText(getString(R.string.last_update, DateTimeUtil.formatTimeWithDayIfNotToday(this, timeInMillis)));
 //        }
     }
 
@@ -311,7 +311,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
                     parseObject(object);
 
-//                    saveLastUpdateTime(_sharedPreferences);
+//                    saveLastUpdateTime(sharedPreferences);
 //                    updateLastUpdateTime();
                 } else {
                     runOnUiThread(new Runnable() {

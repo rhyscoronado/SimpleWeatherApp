@@ -31,11 +31,6 @@ public class WeatherUtil {
         return myBitmap;
     }
 
-    public static Typeface getIcon(Context context) {
-
-        return Typeface.createFromAsset(context.getResources().getAssets(), "fonts/weather.ttf");
-    }
-
     public static String setWeatherIcon(int actualId, int hourOfDay, Context context) {
         int id = actualId / 100;
         String icon = "";

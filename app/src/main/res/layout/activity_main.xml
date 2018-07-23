@@ -21,11 +21,12 @@
 
     <!--</LinearLayout>-->
 
-    <fragment
-        class="com.rhyscoronado.weatherapp.fragment.WeatherInfoFragment"
+    <LinearLayout
+        android:id="@+id/main_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:tag="weather" />
+        android:tag="weather"
+        android:orientation="vertical"/>
 
 
 
